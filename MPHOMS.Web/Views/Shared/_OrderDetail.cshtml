@@ -1,0 +1,122 @@
+﻿@model MPHOMS.Web.Models.OrderViewModel;
+
+<form asp-controller="Home" method="post" id="order-form">
+
+    <div class="modal-body" id="myModalBodyDiv">
+        @foreach (var item in Model.Orders)
+        {
+            var result = "";
+            @switch (item.OrderStatusId)
+            {
+                case 20:
+                    result = "Processing";
+                    break;
+                case 30:
+                    result = "Completed";
+                    break;
+                default:
+                    Console.WriteLine("Default case");
+                    break;
+            }
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    Order Information
+                </div>
+                <div class="card-body">
+                    <dl class="dl-horizontal">
+                        <dt>Order Number:</dt>
+                        <dd> @Html.DisplayFor(modelItem => item.CustomOrderNumber)</dd>
+                        <dt>Total:</dt>
+                        <dd> $@Html.DisplayFor(modelItem => item.OrderTotal)</dd>
+                        <dt>Order Status:</dt>
+                        <dd> @result</dd>
+                    </dl>
+                </div>
+            </div>
+
+            @if (item.PickupInStore == false)
+            {
+                <div class="card">
+                    <div class="card-header card-header-primary">
+                        Shipping Information
+                    </div>
+                    <div class="card-body">
+                        @*@foreach (var ship in Model.GetOrderShippingDetail)
+                        {*@
+                            <dl class="dl-horizontal">
+                                <dt>Name:</dt>
+                                <dd> @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.FirstName) @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.LastName)</dd>
+                                <dt>Email:</dt>
+                                <dd> @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.Email)</dd>
+                                <dt>Phone Number:</dt>
+                                <dd> @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.PhoneNumber)</dd>
+                                <dt>Address:</dt>
+                                <dd> @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.Address1)</dd>
+                                <dt></dt>
+                                <dd> @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.City), @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.State)</dd>
+                                <dt>Shipping Status:</dt>
+                                <dd> @Html.DisplayFor(modelItem => Model.GetOrderShippingDetail.ShippingStatus)</dd>
+                            </dl>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        <div class="card">
+            <div class="card-header card-header-primary">
+                Products
+            </div>
+            <td class="card-body">
+                <table class="table">
+                    <thead class=" text-primary">
+                        <tr>
+                            <th>
+                                Product
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Modifications
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var items in Model.GetOrderDetail)
+                        {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => items.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => items.Quantity)
+                            </td>
+                            @if (!string.IsNullOrEmpty(items.AttributeDescription))
+                            {
+                                <td>
+                                    @Html.Raw(items.AttributeDescription)
+                                </td>
+                            }
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        @foreach (var sub in Model.Orders)
+        {
+            @if (sub.PickupInStore == false)
+            {
+                <button type="submit" class="btn btn-primary" asp-action="EditShipmentStatus" asp-route-id="@sub.Id" value="@sub.Id">Ready for Ship</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-primary" asp-action="EditPickupStatus" asp-route-id="@sub.Id" value="@sub.Id">Ready for Pick Up</button>
+            }
+        }
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+
+</form>
